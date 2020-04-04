@@ -1,36 +1,44 @@
 {
-    "name": "olliesplayground/clinch",
-    "type": "library",
-    "homepage": "https://github.com/olliesplayground/clinch",
-    "keywords": ["cli", "command line interface", "command line", "command", "scripting", "script"],
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Ollie Finn",
-            "email": "ollie@olliefinn.com"
-        }
-    ],
-    "minimum-stability": "stable",
-    "require": {
-      "php": ">=7.1"
-    },
-    "version": "0.2.0",
-    "scripts": {
-        "phpunit:test": [
-            "@php ./vendor/bin/phpunit"
-        ]
-    },
-    "autoload": {
-        "psr-0": {
-            "Clinch": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-0": {
-            "Clinch\\Test\\": "tests/"
-        }
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^9.1"
+  "name": "olliesplayground/clinch",
+  "type": "library",
+  "homepage": "https://github.com/olliesplayground/clinch",
+  "keywords": [
+    "cli",
+    "command line interface",
+    "command line",
+    "command",
+    "scripting",
+    "script"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ollie Finn",
+      "email": "ollie@olliefinn.com"
     }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.1"
+  },
+  "version": "0.2.0",
+  "scripts": {
+    "phpunit:test": [
+      "@php ./vendor/bin/phpunit"
+    ]
+  },
+  "autoload": {
+    "psr-0": {
+      "Clinch": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-0": {
+      "Clinch\\Test\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.1"
+  },
+  "description": "Makes working with command line arguments a lot more pleasant"
 }
