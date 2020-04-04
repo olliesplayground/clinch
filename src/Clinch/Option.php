@@ -4,6 +4,8 @@
 namespace Clinch;
 
 
+use ReflectionClass;
+
 class Option
 {
     /**
@@ -17,36 +19,29 @@ class Option
     private $shortName;
 
     /**
-     * @var string
+     * @var int
      */
-    private $description;
+    private $type = self::TYPE_OPTIONAL;
 
     /**
-     * @var Argument
+     * @var string
      */
-    private $argument;
+    private $value;
+
+    public const TYPE_FLAG = 0;
+    public const TYPE_OPTIONAL = 1;
+    public const TYPE_REQUIRED = 2;
 
 
     /**
      * Option constructor.
-     * @param string|null $longName
+     * @param string|null $shortName
      */
-    public function __construct(string $longName = null)
+    public function __construct(string $shortName = null)
     {
-        if ($longName) {
-            $this->setLongName($longName);
+        if ($shortName) {
+            $this->setShortName($shortName);
         }
-    }
-
-    /**
-     * @param string $longName
-     * @return Option
-     */
-    public function setLongName(string $longName): Option
-    {
-        $this->longName = $longName;
-
-        return $this;
     }
 
     /**
@@ -61,56 +56,135 @@ class Option
     }
 
     /**
-     * @param $description
+     * @param string $longName
      * @return Option
      */
-    public function setDescription($description): Option
+    public function setLongName(string $longName): Option
     {
-        $this->description = $description;
+        $this->longName = $longName;
 
         return $this;
     }
 
     /**
-     * @param Argument $argument
+     * @param mixed $value
      * @return Option
      */
-    public function setArgument(Argument $argument): Option
+    public function setValue($value): Option
     {
-        $this->argument = $argument;
+        $this->value = $value;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function longName(): string
+    public function setType(int $type): Option
     {
-        return $this->longName;
+        $reflectionClass = new ReflectionClass(__CLASS__);
+        $constants = $reflectionClass->getConstants();
+
+        $this->type = in_array($type, $constants, true) ?
+            $type :
+            self::TYPE_OPTIONAL;
+
+        return $this;
     }
 
     /**
      * @return string|null
      */
-    public function shortName(): ?string
+    public function longName(): ?string
     {
-        return $this->shortName;
+        return $this->longName;
     }
 
     /**
      * @return string
      */
-    public function description(): string
+    public function shortName(): string
     {
-        return $this->description;
+        return $this->shortName;
     }
 
     /**
-     * @return Argument|null
+     * @return int
      */
-    public function argument(): ?Argument
+    public function type(): int
     {
-        return $this->argument;
+        return $this->type;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function value()
+    {
+        if ( $this->value === null ) {
+            $this->setValue( $this->getValue() );
+        }
+
+        return $this->value;
+    }
+
+    /**
+     * @return string
+     */
+    public function compileShortOption(): string
+    {
+        $short  = $this->shortName();
+
+        if ($this->type() === self::TYPE_OPTIONAL) {
+            $short .= '::';
+        } else if ($this->type() === self::TYPE_REQUIRED) {
+            $short .= ':';
+        }
+
+        return $short;
+    }
+
+    /**
+     * @return array
+     */
+    public function compileLongOption(): array
+    {
+        $long = [];
+
+        if ($this->longName()) {
+            $longOption = $this->longName;
+
+            if ($this->type() === self::TYPE_OPTIONAL) {
+                $longOption .= '::';
+            } else if ($this->type() === self::TYPE_REQUIRED) {
+                $longOption .= ':';
+            }
+
+            $long[] = $longOption;
+        }
+
+        return $long;
+    }
+
+    public function parseValues(array $values)
+    {
+        if ( array_key_exists($this->shortName(), $values) ) {
+            return $this->type() === self::TYPE_FLAG ? true : $values[$this->shortName()];
+        }
+
+        if ( $this->longName() && array_key_exists($this->longName(), $values) ) {
+            return $this->type() === self::TYPE_FLAG ? true : $values[$this->longName()];
+        }
+
+        return false;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        $short  = $this->compileShortOption();
+
+        $long = $this->compileLongOption();
+
+        return $this->parseValues(getopt($short, $long));
     }
 }

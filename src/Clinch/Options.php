@@ -12,144 +12,74 @@ class Options
     private $options = [];
 
     /**
-     * @var Argument[]
-     */
-    private $arguments = [];
-
-    public function __construct()
-    {
-        $this->parseArgs();
-    }
-
-    /**
-     * @param array|null $args
-     */
-    public function parseArgs(array $args = null): void
-    {
-        $arguments = $args ?? $_SERVER['argv'];
-
-        /**
-         * Remove executed script
-         */
-        array_shift($arguments);
-
-        foreach ($arguments as $argument) {
-            $this->arguments[] = new Argument($argument);
-        }
-    }
-
-    /**
-     * @return Argument[]
-     */
-    public function getArguments(): array
-    {
-        return $this->arguments;
-    }
-
-    /**
      * @param Option $option
-     * @param string $longName
+     * @param string $shortName
      * @return Option
      */
-    public function addOption(Option $option, string $longName): Option
+    public function addOption(Option $option, string $shortName): Option
     {
-        if ($this->optionExists($longName)) {
-            return $this->options[$longName];
+        if ($this->optionExists($shortName)) {
+            return $this->options[$shortName];
         }
 
-        $this->options[$longName] = $option;
+        $this->options[$shortName] = $option;
 
         return $option;
     }
 
     /**
-     * @param string $longName
+     * @param string $shortName
      * @return Option
      */
-    public function newOption(string $longName): Option
+    public function newOption(string $shortName): Option
     {
-        if ($this->optionExists($longName)) {
-            return $this->options[$longName];
+        if ($this->optionExists($shortName)) {
+            return $this->options[$shortName];
         }
 
-        $option = new Option($longName);
+        $option = new Option($shortName);
 
-        return $this->addOption($option, $longName);
+        return $this->addOption($option, $shortName);
     }
 
     /**
-     * @param string $longName
+     * @param string $shortName
      * @return bool
      */
-    public function optionExists(string $longName): bool
+    public function optionExists(string $shortName): bool
     {
-        return array_key_exists($longName, $this->options);
+        return array_key_exists($shortName, $this->options);
     }
 
     /**
-     * @param string $longName
+     * @return Option[]
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param string $shortName
      * @return Option|null
      */
-    public function getOption(string $longName): ?Option
+    public function getOption(string $shortName): ?Option
     {
-        if (!array_key_exists($longName, $this->options)) {
+        if (!array_key_exists($shortName, $this->options)) {
             return null;
         }
 
-        return $this->options[$longName];
+        return $this->options[$shortName];
     }
 
     /**
-     * @param string $longName
+     * @param string $shortName
      * @return mixed
      */
-    public function getOptionValue(string $longName)
+    public function getOptionValue(string $shortName)
     {
-        $option = $this->getOption($longName);
+        $option = $this->getOption($shortName);
 
-        if ( $option === null ) {
-            return null;
-        }
-
-        $argumentSet = $this->matchArgumentToOption($option);
-
-        return $argumentSet ? $option->argument()->getValue() : null;
-    }
-
-    /**
-     * @param Option $option
-     * @return bool
-     */
-    public function matchArgumentToOption(Option $option): bool
-    {
-        $argumentSet = true;
-
-        if ($option->argument() === null) {
-            $argumentSet = false;
-            /** @var $argument Argument */
-            foreach ($this->arguments as $argument) {
-                if ($argument->getType() === Argument::TYPE_FLAG) {
-                    $argument->setValue(true);
-                    $option->setArgument($argument);
-                    $argumentSet = true;
-                    break;
-                }
-
-                if ($argument->getType() === Argument::TYPE_LONG && $argument->getName() === $option->longName()) {
-                    $option->setArgument($argument);
-                    $argumentSet = true;
-                    break;
-                }
-
-                if ($option->shortName() !== null && $argument->getType() === Argument::TYPE_SHORT && strpos($argument->getName(), $option->shortName()) === 0) {
-                    $argument->setValue(substr($argument->getName(), strlen($option->shortName())));
-                    $option->setArgument($argument);
-                    $argumentSet = true;
-                    break;
-                }
-            }
-        }
-
-        return $argumentSet;
+        return $option === null ? null : $option->value();
     }
 }
