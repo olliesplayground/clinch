@@ -32,5 +32,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.1"
-    }
+    },
+  "extra": {
+    "class": "Clinch"
+  }
 }
