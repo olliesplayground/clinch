@@ -90,19 +90,19 @@ class Option
     }
 
     /**
-     * @return string|null
-     */
-    public function longName(): ?string
-    {
-        return $this->longName;
-    }
-
-    /**
      * @return string
      */
     public function shortName(): string
     {
         return $this->shortName;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function longName(): ?string
+    {
+        return $this->longName;
     }
 
     /**
