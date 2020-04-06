@@ -21,6 +21,8 @@ Clinch is used in the following way
 `example.php`
 
 ```
+<?php
+
 require_once 'vendor/autoload.php';
 
 use Clinch\Options;
@@ -46,7 +48,7 @@ Locale: en
 or
 
 ```
-php example.php -locale=de
+php example.php --locale=de
 Locale: de
 ```
 
